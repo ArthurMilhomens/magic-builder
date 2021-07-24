@@ -1,13 +1,16 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { styles } from './styles';
 
 import Filter from '../../components/Filter';
-import { Text, View } from '../../components/Themed';
+import CardList from '../../components/CardList';
+import { View } from '../../components/Themed';
+import Context from '../../context/context';
 
 export default function TabOneScreen() {
+  const { screen } = useContext(Context);
   return (
     <View style={styles.container}>
-      <Filter />
+      {screen ? <CardList /> : <Filter />}
     </View>
   );
 };

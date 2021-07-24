@@ -1,19 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { styles } from './styles';
 
 import { Text, View, TextInput, Image, Pressable, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-community/picker';
 
+import Context from '../../context/context';
+
 export default function Filter() {
   const [query, setQuery] = useState({ cardName: '', text: '', type: '', colors: '', manaCost: '' });
   const [colorOperator, setColorOperator] = useState('=');
+  const { searchCards } = useContext(Context);
+  const [loadingCards, setLoadingCards] = useState(false);
 
   interface Color {
     color: string
+  };
+
+  interface Search {
+    query: { cardName: String, text: String, type: String, colors: String, manaCost: String },
+    colorOperator: String
+  };
+
+  interface Screen {
+    screen: false
   }
 
   function addColorsToSearch({ color }:Color){
     setQuery({...query, colors: query.colors.includes(color) ? query.colors.replace(color, '') : (query.colors.concat(color))})
+  }
+
+  function submit(query:Search){
+    setLoadingCards(true);
+
+    searchCards(query).finally(() => {
+      setLoadingCards(false);
+    })
   }
 
   return (
@@ -75,13 +96,13 @@ export default function Filter() {
         <TextInput style={styles.input} placeholderTextColor="#919191" placeholder='Ex. "{2}{R}{U}" - {U} Blue, {B} Black, {R} Red, {G} Green, {W} White, {C} Colorless' onChangeText={e => setQuery({ ...query, manaCost: e })} />
       </View>
 
-      {/* <Pressable disabled={loading} style={styles.button} onPress={() => LoadLogin(user)}>
-          {loading ?
+      <Pressable disabled={loadingCards} style={styles.button} onPress={() => submit({query, colorOperator})}>
+          {loadingCards ?
             <ActivityIndicator color="white" size={30} /> :
-            <MonoText style={styles.buttonText}>
+            <Text>
               ENVIAR
-            </MonoText>}
-        </Pressable> */}
+            </Text>}
+        </Pressable>
 
     </View>
   );

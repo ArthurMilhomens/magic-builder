@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const magic = axios.create({
+const api = axios.create({
   baseURL: "https://api.scryfall.com"
 });
 
-export default magic;
+export default api;

@@ -13,6 +13,7 @@ export const styles = StyleSheet.create({
     paddingTop: 5,
     fontSize: 16,
     maxWidth: '70%',
+    color: '#e6e6e6'
   },
   label: {
     color: '#e6e6e6',
@@ -41,5 +42,13 @@ export const styles = StyleSheet.create({
   },
   activeImage: {
     backgroundColor: "#62d8ff",
+  },
+  button: {
+    backgroundColor: 'red',
+    width: '20%',
+    paddingVertical: 20,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
