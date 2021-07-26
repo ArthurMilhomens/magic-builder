@@ -7,9 +7,10 @@ import { Picker } from '@react-native-community/picker';
 import Context from '../../context/context';
 
 export default function Filter() {
+  const { searchCards, logout } = useContext(Context);
+  
   const [query, setQuery] = useState({ cardName: '', text: '', type: '', colors: '', manaCost: '' });
   const [colorOperator, setColorOperator] = useState('=');
-  const { searchCards } = useContext(Context);
   const [loadingCards, setLoadingCards] = useState(false);
 
   interface Color {
@@ -20,10 +21,6 @@ export default function Filter() {
     query: { cardName: String, text: String, type: String, colors: String, manaCost: String },
     colorOperator: String
   };
-
-  interface Screen {
-    screen: false
-  }
 
   function addColorsToSearch({ color }:Color){
     setQuery({...query, colors: query.colors.includes(color) ? query.colors.replace(color, '') : (query.colors.concat(color))})
@@ -101,6 +98,13 @@ export default function Filter() {
             <ActivityIndicator color="white" size={30} /> :
             <Text>
               ENVIAR
+            </Text>}
+        </Pressable>
+      <Pressable disabled={loadingCards} style={styles.button} onPress={() => logout()}>
+          {loadingCards ?
+            <ActivityIndicator color="white" size={30} /> :
+            <Text>
+              limpar cache
             </Text>}
         </Pressable>
 

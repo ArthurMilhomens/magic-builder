@@ -6,10 +6,12 @@ import { View, Image, Pressable, FlatList } from 'react-native';
 import Context from '../../context/context';
 
 export default function CardList() {
-  const { cards, addCardToDeck } = useContext(Context);
+  const { cards, addCardToDeck, deck } = useContext(Context);
+  const [markedCards, setMarkedCards] = useState(['']);
 
   type Cards = Object[];
   const cardsToList: Cards = cards as object[];
+  const deckToList: Cards = deck as object[];
 
   const formatData = (data:any, numColumns:number) => {
     const numberOfFullRows = Math.floor(cardsToList.length / numColumns);
@@ -23,6 +25,12 @@ export default function CardList() {
     return data
   }
 
+  function add(card:string){
+    markedCards.push(card);
+    addCardToDeck(card);
+    setMarkedCards(markedCards);
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -34,7 +42,8 @@ export default function CardList() {
             return <View style={styles.voidItem}/>
           }
           return (
-            <Pressable onPress={() => addCardToDeck(item)} style={[styles.card, styles.activeCard]}>
+            <Pressable onPress={() => add(item)} 
+            style={[styles.card, ((deckToList && deckToList.includes(`${item.card_faces ? item.card_faces[0].image_uris.normal : item.image_uris.normal}`)) || markedCards.includes(`${item.card_faces ? item.card_faces[0].image_uris.normal : item.image_uris.normal}`)) && styles.activeCard]}>
               <Image style={styles.image} source={{
                 uri: `${item.card_faces ? item.card_faces[0].image_uris.normal : item.image_uris.normal}`,
               }} />

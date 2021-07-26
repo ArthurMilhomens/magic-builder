@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { styles } from './styles';
 
 import { View, Image, Pressable, FlatList } from 'react-native';
@@ -8,13 +8,14 @@ import Context from '../../context/context';
 export default function DeckList() {
   const { deck } = useContext(Context);
 
-
+  
+  
   type Cards = Object[];
   const cardsToList: Cards = deck as object[];
-
+  
+  console.log('data -> ', cardsToList)
   const formatData = (data:any, numColumns:number) => {
     if (cardsToList) {
-      console.log(cardsToList)
       const numberOfFullRows = Math.floor(cardsToList.length / numColumns);
   
       let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
@@ -31,16 +32,17 @@ export default function DeckList() {
     <View style={styles.container}>
       <FlatList
         data={formatData(cardsToList, 3)}
-        keyExtractor={(item: any) => item.id}
+        // data={cardsToList}
+        keyExtractor={(item: any,) => item}
         numColumns={3}
         renderItem={({ item }:any) => {
           if (item.empty) {
             return <View style={styles.voidItem}/>
           }
           return (
-            <Pressable style={[styles.card, styles.activeCard]}>
+            <Pressable style={styles.card}>
               <Image style={styles.image} source={{
-                uri: `${item.card_faces ? item.card_faces[0].image_uris.normal : item.image_uris.normal}`,
+                uri: `${item}`,
               }} />
             </Pressable>
           )

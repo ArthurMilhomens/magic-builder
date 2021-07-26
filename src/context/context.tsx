@@ -7,8 +7,9 @@ interface ContextData {
   deck: object | null;
   loading: boolean;
   screen: boolean;
-  searchCards({ query, colorOperator}:Search) : Promise<void>;
-  addCardToDeck(card:any): void;
+  searchCards({ query, colorOperator }: Search): Promise<void>;
+  addCardToDeck(card: any): void;
+  logout(): void;
 };
 
 interface Search {
@@ -20,39 +21,51 @@ const Context = createContext<ContextData>({} as ContextData);
 
 export const ContextProvider: React.FC = ({ children }) => {
   const [cards, setCards] = useState<object | null>(null);
-  const [deck, setDeck] = useState<object | null>(null);
+  const [deck, setDeck] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStorageData() {
-      const storagedDeck = await AsyncStorage.getItem('@RNAuth:deck');
-
-      if (storagedDeck) {
-        setDeck([JSON.parse(storagedDeck)]);
-        setLoading(false);
-      } else {
-        setLoading(false)
-      }
-    }
-
     loadStorageData();
-  });
+  }, []);
 
-  async function searchCards({ query, colorOperator }:Search){
-    const response = await search({query, colorOperator});
+  async function loadStorageData() {
+    const storagedDeck = await AsyncStorage.getItem('@RNAuth:deck');
+
+    if (storagedDeck) {
+      setDeck([JSON.parse(storagedDeck)]);
+      setLoading(false);
+    } else {
+      setLoading(false)
+    }
+  }
+
+  async function searchCards({ query, colorOperator }: Search) {
+    const response = await search({ query, colorOperator });
 
     setCards(response.data.data);
   }
 
-  async function addCardToDeck(card:any) {
-    deck === null ? await AsyncStorage.setItem('@RNAuth:deck', JSON.stringify(card)) : await AsyncStorage.mergeItem('@RNAuth:deck', JSON.stringify(card));
-    const storagedDeck = await AsyncStorage.getItem('@RNAuth:deck');
+  async function addCardToDeck(card: any) {
 
-    setDeck(storagedDeck ? [JSON.parse(storagedDeck)] : null)
+    if (deck) {
+      deck.push(card.card_faces ? card.card_faces[0].image_uris.normal : card.image_uris.normal);
+      await AsyncStorage.setItem('@RNAuth:deck', JSON.stringify(deck))
+      setDeck(deck)
+    } else {
+      await AsyncStorage.setItem('@RNAuth:deck', JSON.stringify(card.card_faces ? card.card_faces[0].image_uris.normal : card.image_uris.normal))
+      setDeck([card.card_faces ? card.card_faces[0].image_uris.normal : card.image_uris.normal])
+    }
+
+  }
+
+  function logout() {
+    AsyncStorage.clear().then(() => {
+      setDeck(null);
+    })
   }
 
   return (
-    <Context.Provider value={{cards, deck, loading, screen: !!cards, searchCards, addCardToDeck}}>
+    <Context.Provider value={{ cards, deck, loading, screen: !!cards, searchCards, addCardToDeck, logout }}>
       {children}
     </Context.Provider>
   )
